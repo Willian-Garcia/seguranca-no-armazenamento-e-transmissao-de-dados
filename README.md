@@ -149,11 +149,11 @@ Frontend: https://localhost:3001
 ---
 
 ## ✅ Requisitos Atendidos
-  ✅ Criptografia híbrida AES + RSA.
-  ✅ Hash seguro para senhas (bcrypt).
-  ✅ Proteção contra XSS, SQL Injection e CSRF.
-  ✅ HTTPS com certificado autoassinado.
-  ✅ Dados criptografados em repouso no banco.
+  - ✅ Criptografia híbrida AES + RSA.
+  - ✅ Hash seguro para senhas (bcrypt).
+  - ✅ Proteção contra XSS, SQL Injection e CSRF.
+  - ✅ HTTPS com certificado autoassinado.
+  - ✅ Dados criptografados em repouso no banco.
 
 ## 🔐 Segurança em primeiro lugar!
-    Este projeto segue as melhores práticas para proteger dados sensíveis e evitar vulnerabilidades comuns.
+- Este projeto segue as melhores práticas para proteger dados sensíveis e evitar vulnerabilidades comuns.
