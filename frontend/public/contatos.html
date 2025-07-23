@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+    <div style="display: flex; justify-content: center; align-items: center; padding: 10px; background-color: #f4f4f4;">
+        <button onclick="logoutUser()" style="width:50%; background-color: #d9534f; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">
+            Logout
+        </button>
+    </div>
+
     <div class="container">
         <h2>Novo Contato</h2>
 
@@ -13,8 +19,10 @@
             <input type="text" id="contactName" placeholder="Nome do Contato">
         </div>
         <div class="form-group">
-            <input type="text" id="contactPhone" placeholder="Telefone">
+            <input type="text" id="contactPhone" maxlength="11" placeholder="Digite 11 dígitos: Ex. 11987654321"
+                   oninput="this.value = this.value.replace(/\\D/g, '').slice(0,11)">
         </div>
+        
 
         <button id="addButton" onclick="addContact()">Adicionar Contato</button>
         <p id="status" style="color: green; font-weight: bold; text-align: center;"></p>

@@ -13,16 +13,15 @@ export function generateRSAKeys(): { publicKey: string; privateKey: string } {
     fs.mkdirSync(KEY_PATH, { recursive: true });
   }
 
-  // ✅ Geração no formato correto (SPKI e PKCS8)
   if (!fs.existsSync(privatePath) || !fs.existsSync(publicPath)) {
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
       modulusLength: 2048,
       publicKeyEncoding: {
-        type: 'spki',   // ✅ Necessário para WebCrypto API
+        type: 'spki',
         format: 'pem'
       },
       privateKeyEncoding: {
-        type: 'pkcs8',  // ✅ Compatível para descriptografia
+        type: 'pkcs8',
         format: 'pem'
       }
     });
@@ -38,20 +37,39 @@ export function generateRSAKeys(): { publicKey: string; privateKey: string } {
   return { publicKey, privateKey };
 }
 
-// ✅ Função para descriptografar dados com RSA (chave privada)
+// ✅ RSA Decrypt
 export function rsaDecrypt(encryptedData: string, privateKey: string): Buffer {
   return crypto.privateDecrypt(
     {
       key: privateKey,
       padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-      oaepHash: 'sha256' // ✅ Alinhado com o frontend
+      oaepHash: 'sha256'
     },
     Buffer.from(encryptedData, 'base64')
   );
 }
 
-// ✅ Função para descriptografar dados com AES
+// ✅ AES Decrypt
 export function aesDecrypt(encrypted: string, key: Buffer, iv: Buffer): string {
+  const decipher = crypto.createDecipheriv(AES_ALGORITHM, key, iv);
+  let decrypted = decipher.update(encrypted, 'base64', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+// ✅ NOVO: AES para dados em repouso (username)
+export function encryptStorageAES(data: string): string {
+  const key = Buffer.from(process.env.STORAGE_KEY!, 'utf8');
+  const iv = Buffer.from(process.env.STORAGE_IV!, 'utf8');
+  const cipher = crypto.createCipheriv(AES_ALGORITHM, key, iv);
+  let encrypted = cipher.update(data, 'utf8', 'base64');
+  encrypted += cipher.final('base64');
+  return encrypted;
+}
+
+export function decryptStorageAES(encrypted: string): string {
+  const key = Buffer.from(process.env.STORAGE_KEY!, 'utf8');
+  const iv = Buffer.from(process.env.STORAGE_IV!, 'utf8');
   const decipher = crypto.createDecipheriv(AES_ALGORITHM, key, iv);
   let decrypted = decipher.update(encrypted, 'base64', 'utf8');
   decrypted += decipher.final('utf8');

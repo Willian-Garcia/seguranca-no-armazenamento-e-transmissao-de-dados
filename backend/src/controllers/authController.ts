@@ -2,13 +2,13 @@ import { Request, Response } from 'express';
 import Pool from '../database/db';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { rsaDecrypt, aesDecrypt, generateRSAKeys } from '../utils/crypto';
+import { rsaDecrypt, aesDecrypt, generateRSAKeys, encryptStorageAES } from '../utils/crypto';
+import { sanitizeInput } from '../utils/sanitize';
 import fs from 'fs';
 import path from 'path';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'jwt_secret';
 
-// Caminho base para as chaves RSA
 const certDir = path.join(__dirname, '../../certs');
 const privateKeyPath = path.join(certDir, 'rsa_private.pem');
 const publicKeyPath = path.join(certDir, 'rsa_public.pem');
@@ -45,10 +45,13 @@ export async function register(req: Request, res: Response) {
     const decUsername = aesDecrypt(username.cipher, key, Buffer.from(username.iv, 'base64'));
     const decPassword = aesDecrypt(password.cipher, key, Buffer.from(password.iv, 'base64'));
 
+    const cleanUsername = sanitizeInput(decUsername);
     const hashedPassword = await bcrypt.hash(decPassword, 12);
 
+    const encryptedUsername = encryptStorageAES(cleanUsername);
+
     await Pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [
-      decUsername,
+      encryptedUsername,
       hashedPassword,
     ]);
 
@@ -70,7 +73,10 @@ export async function login(req: Request, res: Response) {
     const decUsername = aesDecrypt(username.cipher, key, Buffer.from(username.iv, 'base64'));
     const decPassword = aesDecrypt(password.cipher, key, Buffer.from(password.iv, 'base64'));
 
-    const result = await Pool.query('SELECT * FROM users WHERE username = $1', [decUsername]);
+    const cleanUsername = sanitizeInput(decUsername);
+    const encryptedUsername = encryptStorageAES(cleanUsername);
+
+    const result = await Pool.query('SELECT * FROM users WHERE username = $1', [encryptedUsername]);
     if (result.rowCount === 0) return res.status(401).json({ error: 'Usuário não encontrado' });
 
     const user = result.rows[0];
