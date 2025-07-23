@@ -41,7 +41,11 @@ export function generateRSAKeys(): { publicKey: string; privateKey: string } {
 // ✅ Função para descriptografar dados com RSA (chave privada)
 export function rsaDecrypt(encryptedData: string, privateKey: string): Buffer {
   return crypto.privateDecrypt(
-    { key: privateKey, padding: crypto.constants.RSA_PKCS1_OAEP_PADDING },
+    {
+      key: privateKey,
+      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+      oaepHash: 'sha256' // ✅ Alinhado com o frontend
+    },
     Buffer.from(encryptedData, 'base64')
   );
 }
@@ -49,7 +53,7 @@ export function rsaDecrypt(encryptedData: string, privateKey: string): Buffer {
 // ✅ Função para descriptografar dados com AES
 export function aesDecrypt(encrypted: string, key: Buffer, iv: Buffer): string {
   const decipher = crypto.createDecipheriv(AES_ALGORITHM, key, iv);
-  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+  let decrypted = decipher.update(encrypted, 'base64', 'utf8');
   decrypted += decipher.final('utf8');
   return decrypted;
 }

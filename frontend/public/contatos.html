@@ -7,7 +7,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Seus Contatos</h2>
+        <h2>Novo Contato</h2>
 
         <div class="form-group">
             <input type="text" id="contactName" placeholder="Nome do Contato">
@@ -16,8 +16,11 @@
             <input type="text" id="contactPhone" placeholder="Telefone">
         </div>
 
-        <button onclick="addContact()">Adicionar Contato</button>
+        <button id="addButton" onclick="addContact()">Adicionar Contato</button>
+        <p id="status" style="color: green; font-weight: bold; text-align: center;"></p>
         <hr>
+
+        <h2>Lista de Contatos</h2>
         <div id="contactsList"></div>
     </div>
 
